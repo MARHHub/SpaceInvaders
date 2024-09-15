@@ -136,33 +136,56 @@ function drawBullet() {
 }
 
 // Draw and move enemy bullets
+// Fix loseLife function to decrease lives and handle game over properly
+function loseLife() {
+    playerLives--; // Decrease lives by 1
+    if (playerLives === 0) {
+        gameOver = true; // Set gameOver flag
+        showGameOverScreen(); // Show game over screen when lives are gone
+    }
+}
+
+// Ensure the collision detection is accurate (change the radius if needed)
+function isCollision(x1, y1, x2, y2, radius) {
+    let distance = Math.sqrt((x1 - x2) ** 2 + (y1 - y2) ** 2);
+    return distance < radius;
+}
+
+// Adjust drawEnemyBullets function to remove only one life per bullet hit
 function drawEnemyBullets() {
     for (let i = 0; i < enemyBullets.length; i++) {
-        ctx.drawImage(enemyBulletImg, enemyBullets[i].x, enemyBullets[i].y, 16, 16);
-        enemyBullets[i].y += 5;
+        const bullet = enemyBullets[i];
+        if (bullet && typeof bullet.y !== 'undefined') {
+            ctx.drawImage(enemyBulletImg, bullet.x, bullet.y, 10, 20);
+            bullet.y += 4; // Keep the original bullet speed
 
-        // Check if enemy bullet hits the player
-        if (isCollision(enemyBullets[i].x, enemyBullets[i].y, playerX, playerY, playerWidth, playerHeight)) {
-            playerLives -= 1;
-            enemyBullets.splice(i, 1); // Remove the bullet
-
-            // Game over check
-            if (playerLives === 0) {
-                gameOver = true;
-                showGameOverScreen();
+            // Remove the bullet if it moves off-screen
+            if (bullet.y > canvas.height) {
+                enemyBullets.splice(i, 1);
+                i--; // Adjust index after removal
             }
-        }
 
-        // Remove enemy bullets if they go off the screen
-        if (enemyBullets[i].y >= canvas.height) {
-            enemyBullets.splice(i, 1);
+            // Check for collision with the player
+            if (isCollision(playerX, playerY, bullet.x, bullet.y, 30)) {
+                loseLife();  // Call loseLife when player is hit
+                enemyBullets.splice(i, 1); // Remove bullet on collision
+                i--; // Adjust index after removal
+            }
         }
     }
 }
 
-// Collision detection
-function isCollision(x1, y1, x2, y2, w2, h2) {
-    return (x1 > x2 && x1 < x2 + w2) && (y1 > y2 && y1 < y2 + h2);
+
+
+// Check if enemy touches the player (game over)
+function checkEnemyCollision() {
+    for (let i = 0; i < enemies.length; i++) {
+        if (isCollision(enemies[i].x, enemies[i].y, playerX, playerY, playerWidth, playerHeight)) {
+            gameOver = true;
+            showGameOverScreen();
+            return;
+        }
+    }
 }
 
 // Show score and lives
@@ -196,6 +219,17 @@ playAgainBtn.addEventListener('click', () => {
     gameOverScreen.style.display = 'none';
     canvas.style.display = 'block';
     gameLoop();
+});
+
+// Show start screen initially
+startScreen.style.display = 'block';
+canvas.style.display = 'none'; // Hide the canvas initially
+
+// Start the game when "Start Game" button is clicked
+startGameBtn.addEventListener('click', () => {
+    startScreen.style.display = 'none';
+    canvas.style.display = 'block';
+    gameLoop(); // Start the game loop
 });
 
 // Game loop
@@ -236,6 +270,7 @@ function gameLoop() {
     drawEnemies();
     drawBullet(); // Update and draw bullet
     drawEnemyBullets(); // Draw enemy bullets
+    checkEnemyCollision(); // Check if enemy touches the player (game over)
 
     // Show score and lives
     showScoreAndLives();
