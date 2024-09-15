@@ -3,16 +3,26 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Space Invader</title>
+    <title>Space Invaders</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
     <canvas id="gameCanvas"></canvas>
+
+    <!-- Start Screen -->
+    <div id="startScreen">
+        <h1>Space Invaders</h1>
+        <p>Press the button to start the game</p>
+        <button id="startGameBtn">Start Game</button>
+    </div>
+
+    <!-- Game Over Screen -->
     <div id="gameOverScreen" style="display:none;">
         <h1>Game Over</h1>
         <p id="finalScore"></p>
         <button id="playAgainBtn">Play Again</button>
     </div>
+
     <script src="main.js"></script>
 </body>
 </html>
