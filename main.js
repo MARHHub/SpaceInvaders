@@ -138,10 +138,10 @@ function drawBullet() {
 // Draw and move enemy bullets
 // Fix loseLife function to decrease lives and handle game over properly
 function loseLife() {
-    playerLives--; // Decrease lives by 1
+    playerLives--; // Decrease player lives by 1
     if (playerLives === 0) {
-        gameOver = true; // Set gameOver flag
-        showGameOverScreen(); // Show game over screen when lives are gone
+        gameOver = true; // Trigger game over if no lives are left
+        showGameOverScreen();
     }
 }
 
